@@ -12,35 +12,37 @@ function register_fns() {
   scene.onPointerDown = pointer_down;
 }
 let t = Date.now();
+let len: number;
 function loop_fn() {
   const dt = (-t + (t = Date.now())) / 1000;
   scene.render();
   Astro.camera.update();
-  for (let i = 0, j = Astro.astros.length - 1; i < j; i++) {
-    const astro = Astro.astros[i];
-    if (i == 0) {
-      astro.attract(Astro.astros[Astro.astros.length - 1], dt);
-    } else {
-      astro.attract(Astro.astros[i + 1], dt);
+  for (let i = 0; i < len; i++) {
+    for (let j = 0; j < len; j++) {
+      if (i == j) continue;
+      Astro.astros[i].attract(Astro.astros[j], dt);
     }
   }
 }
 
 function earth_material() {
   const material = new StandardMaterial('earth', scene);
-  material.ambientColor = new Color3(1, 0, 0);
+  material.diffuseColor = new Color3(1, 0, 0);
   return material;
 }
 function moon_material() {
   const material = new StandardMaterial('moon', scene);
-  material.ambientColor = new Color3(0, 0, 1);
+  material.diffuseColor = new Color3(0, 0, 1);
   return material;
 }
 function main() {
   register_fns();
-  const earth = new Astro(earth_material(), 20, 5);
-  const moon = new Astro(moon_material(), 10, 3);
-  const worm = new Wormhole(new Vector3(0, 0, 100), new Vector3(100, 0, 0));
+  const earth = new Astro('terra', earth_material(), 20, 5);
+  earth.position.x += 40;
+  //Astro.camera.lock_at(earth, 10);
+  const moon = new Astro('moon', moon_material(), 10, 3);
+  const worm = new Wormhole(new Vector3(0, 0, 500), new Vector3(100, 0, 0));
+  len = Astro.astros.length;
   engine.runRenderLoop(loop_fn);
 }
 main();
